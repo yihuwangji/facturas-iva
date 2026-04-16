@@ -1,19 +1,768 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>GitHub Pages Test</title>
-    <style>
-        body {
-            text-align: center;
-            margin-top: 100px;
-            font-family: Arial;
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --s:var(--color-background-secondary);
+  --p:var(--color-background-primary);
+  --b:var(--color-border-tertiary);
+  --b2:var(--color-border-secondary);
+  --t:var(--color-text-primary);
+  --t2:var(--color-text-secondary);
+  --t3:var(--color-text-tertiary);
+  --info-bg:var(--color-background-info);
+  --info-t:var(--color-text-info);
+  --suc-bg:var(--color-background-success);
+  --suc-t:var(--color-text-success);
+  --warn-bg:var(--color-background-warning);
+  --warn-t:var(--color-text-warning);
+  --err-bg:var(--color-background-danger);
+  --err-t:var(--color-text-danger);
+}
+body{font-family:var(--font-sans);font-size:14px;color:var(--t);background:transparent}
+
+.app{display:flex;flex-direction:column;gap:0}
+
+/* tabs */
+.tabs{display:flex;gap:2px;padding:0 0 12px;border-bottom:0.5px solid var(--b);margin-bottom:16px;overflow-x:auto;flex-wrap:nowrap}
+.tab{padding:6px 14px;border-radius:var(--border-radius-md);border:0.5px solid transparent;font-size:13px;cursor:pointer;color:var(--t2);background:transparent;white-space:nowrap;transition:all 0.15s}
+.tab:hover{background:var(--s);color:var(--t)}
+.tab.active{background:var(--p);border-color:var(--b2);color:var(--t);font-weight:500}
+
+.page{display:none}
+.page.active{display:block}
+
+/* kpi row */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--s);border-radius:var(--border-radius-md);padding:12px 14px}
+.kpi-l{font-size:12px;color:var(--t2);margin-bottom:5px}
+.kpi-v{font-size:22px;font-weight:500;color:var(--t);font-family:var(--font-mono);line-height:1}
+.kpi-s{font-size:11px;color:var(--t3);margin-top:4px}
+
+/* section card */
+.sc{background:var(--p);border:0.5px solid var(--b);border-radius:var(--border-radius-lg);margin-bottom:12px;overflow:hidden}
+.sh{padding:10px 14px;border-bottom:0.5px solid var(--b);display:flex;align-items:center;justify-content:space-between;background:var(--s)}
+.stitle{font-size:13px;font-weight:500;color:var(--t)}
+.sh-right{display:flex;gap:6px;align-items:center}
+
+/* table */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{padding:7px 12px;font-size:11px;font-weight:500;color:var(--t2);text-align:left;background:var(--s);border-bottom:0.5px solid var(--b);white-space:nowrap;letter-spacing:0.3px}
+th.r,td.r{text-align:right} th.c,td.c{text-align:center}
+tbody tr{border-bottom:0.5px solid var(--b)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--s)}
+td{padding:8px 12px;font-size:13px;color:var(--t);vertical-align:middle}
+td.mono{font-family:var(--font-mono);font-size:12px}
+.empty-td{text-align:center;color:var(--t3);padding:24px 12px;font-size:13px}
+
+/* badges */
+.badge{display:inline-block;padding:2px 7px;border-radius:var(--border-radius-md);font-size:11px;font-weight:500}
+.b-sale{background:var(--info-bg);color:var(--info-t)}
+.b-buy{background:var(--warn-bg);color:var(--warn-t)}
+.b-21{background:var(--err-bg);color:var(--err-t)}
+.b-10{background:var(--warn-bg);color:var(--warn-t)}
+.b-4{background:var(--suc-bg);color:var(--suc-t)}
+.b-0{background:var(--s);color:var(--t3)}
+.b-ai{background:var(--info-bg);color:var(--info-t)}
+.b-manual{background:var(--s);color:var(--t3)}
+
+/* form */
+.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:8px;align-items:end;padding:12px 14px}
+.fl{display:flex;flex-direction:column;gap:3px}
+.fl label{font-size:11px;color:var(--t2);font-weight:500}
+.fl input,.fl select{font-size:13px;padding:6px 8px}
+
+/* upload zone */
+.drop-zone{border:1.5px dashed var(--b2);border-radius:var(--border-radius-lg);padding:28px 16px;text-align:center;cursor:pointer;transition:all 0.2s;margin:12px 14px}
+.drop-zone:hover,.drop-zone.over{border-color:var(--info-t);background:var(--info-bg)}
+.drop-icon{font-size:28px;margin-bottom:8px}
+.drop-title{font-size:14px;font-weight:500;color:var(--t);margin-bottom:4px}
+.drop-sub{font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.5}
+.drop-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+/* queue */
+.queue{display:flex;flex-direction:column;gap:6px;padding:0 14px 12px}
+.qi{background:var(--s);border:0.5px solid var(--b);border-radius:var(--border-radius-md);padding:10px 12px;display:flex;align-items:center;gap:10px}
+.qi-info{flex:1;min-width:0}
+.qi-name{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t)}
+.qi-status{font-size:11px;color:var(--t3);margin-top:2px}
+.qi-status.ok{color:var(--suc-t)} .qi-status.err{color:var(--err-t)} .qi-status.run{color:var(--info-t)}
+.qi-prog{width:90px;height:3px;background:var(--b2);border-radius:99px;flex-shrink:0}
+.qi-bar{height:100%;border-radius:99px;background:var(--info-t);transition:width 0.3s ease}
+
+/* preview box */
+.prev-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.prev-box{background:var(--s);border:0.5px solid var(--b);border-radius:var(--border-radius-md);padding:10px 12px}
+.prev-box-l{font-size:11px;color:var(--t2);margin-bottom:3px;font-weight:500}
+.prev-box-v{font-family:var(--font-mono);font-size:16px;font-weight:500;color:var(--t)}
+.prev-box.red .prev-box-v{color:var(--err-t)}
+.prev-box.blue .prev-box-v{color:var(--info-t)}
+
+/* iva summary */
+.iva-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px}
+.iva-box{border:0.5px solid var(--b);border-radius:var(--border-radius-md);padding:12px 14px}
+.iva-box.rep{background:var(--err-bg)}
+.iva-box.dep{background:var(--suc-bg)}
+.iva-box.liq{background:var(--info-bg);grid-column:1/-1}
+.iva-label{font-size:11px;font-weight:500;color:var(--t2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px}
+.iva-box.rep .iva-label{color:var(--err-t)}
+.iva-box.dep .iva-label{color:var(--suc-t)}
+.iva-box.liq .iva-label{color:var(--info-t)}
+.iva-amt{font-family:var(--font-mono);font-size:20px;font-weight:500;color:var(--t)}
+.iva-box.liq .iva-amt{font-size:24px}
+.iva-note{font-size:11px;color:var(--t3);margin-top:3px}
+.iva-status{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:var(--border-radius-md);font-size:12px;font-weight:500}
+.is-pay{background:var(--err-bg);color:var(--err-t)}
+.is-ref{background:var(--suc-bg);color:var(--suc-t)}
+.is-zero{background:var(--s);color:var(--t3)}
+
+/* tax breakdown */
+.tax-row{display:grid;grid-template-columns:80px 1fr 1fr 1fr 1fr;border-bottom:0.5px solid var(--b)}
+.tax-row:last-child{border-bottom:none}
+.tax-row.hd{background:var(--s);font-size:11px;font-weight:500;color:var(--t2)}
+.tc{padding:9px 12px;font-size:13px;display:flex;align-items:center}
+.tc.r{justify-content:flex-end;font-family:var(--font-mono);font-size:12px}
+
+/* confirm overlay approach — normal flow faux-modal */
+.modal-wrap{display:none;background:rgba(0,0,0,0.35);min-height:300px;border-radius:var(--border-radius-lg);padding:20px;align-items:flex-start;justify-content:center;margin-top:10px}
+.modal-wrap.open{display:flex}
+.modal-inner{background:var(--p);border:0.5px solid var(--b2);border-radius:var(--border-radius-lg);width:100%;max-width:580px;overflow:hidden}
+.modal-head{padding:12px 16px;border-bottom:0.5px solid var(--b);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:14px;font-weight:500;color:var(--t)}
+.modal-body{padding:16px}
+.pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.pf{display:flex;flex-direction:column;gap:3px}
+.pf label{font-size:11px;font-weight:500;color:var(--t2)}
+.pf input,.pf select{font-size:13px;padding:6px 8px}
+.pf.full{grid-column:1/-1}
+.raw-text{background:var(--s);border:0.5px solid var(--b);border-radius:var(--border-radius-md);padding:8px 10px;font-size:11px;color:var(--t3);max-height:70px;overflow-y:auto;white-space:pre-wrap;font-family:var(--font-mono);line-height:1.5;margin-bottom:10px}
+
+/* quarter grid */
+.q-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px}
+.q-box{border:0.5px solid var(--b);border-radius:var(--border-radius-md);overflow:hidden;cursor:pointer;transition:border-color 0.15s}
+.q-box:hover{border-color:var(--b2)}
+.q-head{background:var(--s);padding:8px 12px;border-bottom:0.5px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+.q-title{font-size:13px;font-weight:500;color:var(--t)}
+.q-period{font-size:11px;color:var(--t3);font-family:var(--font-mono)}
+.q-body{padding:10px 12px}
+.q-stat{display:flex;justify-content:space-between;padding:2px 0;font-size:12px}
+.q-sl{color:var(--t2)} .q-sv{font-family:var(--font-mono);font-weight:500;color:var(--t)}
+.q-sv.r{color:var(--err-t)} .q-sv.g{color:var(--suc-t)} .q-sv.b{color:var(--info-t)}
+.q-div{height:0.5px;background:var(--b);margin:6px 0}
+.q-foot{padding:4px 12px 8px;font-size:11px;color:var(--t3)}
+
+/* 303 */
+.f303{padding:14px}
+.f303-title{text-align:center;margin-bottom:14px}
+.f303-title h2{font-size:14px;font-weight:500;color:var(--t)}
+.f303-title p{font-size:11px;color:var(--t3);margin-top:2px}
+.f303-sec{border:0.5px solid var(--b);border-radius:var(--border-radius-md);overflow:hidden;margin-bottom:10px}
+.f303-sh{background:var(--s);padding:6px 12px;font-size:11px;font-weight:500;color:var(--t2);border-bottom:0.5px solid var(--b);text-transform:uppercase;letter-spacing:0.4px}
+.f303-row{display:grid;grid-template-columns:30px 1fr 1fr 1fr;border-bottom:0.5px solid rgba(0,0,0,0.04)}
+.f303-row:last-child{border-bottom:none}
+.fc{padding:6px 10px;font-size:12px;display:flex;align-items:center}
+.fc.num{font-family:var(--font-mono);font-size:10px;color:var(--t3);border-right:0.5px solid var(--b)}
+.fc.label{color:var(--t2)} .fc.val{font-family:var(--font-mono);font-size:12px;font-weight:500;justify-content:flex-end;border-left:0.5px solid var(--b)}
+.f303-total{display:grid;grid-template-columns:1fr auto;padding:9px 12px;border-top:1px solid var(--b2);background:var(--info-bg)}
+.f303-tl{font-size:13px;font-weight:500;color:var(--info-t)} .f303-tv{font-family:var(--font-mono);font-size:14px;font-weight:500;color:var(--info-t)}
+
+.notif{position:fixed;bottom:16px;right:16px;background:var(--t);color:var(--p);padding:9px 14px;border-radius:var(--border-radius-md);font-size:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);transform:translateY(50px);opacity:0;transition:all 0.2s;max-width:280px;z-index:9999;pointer-events:none}
+.notif.show{transform:translateY(0);opacity:1}
+
+.tf{padding:8px 12px;border-top:0.5px solid var(--b);display:flex;justify-content:flex-end;gap:16px;background:var(--s)}
+.tf span{font-size:12px;color:var(--t2)} .tf .v{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--t)}
+.tf .v.r{color:var(--err-t)} .tf .v.b{color:var(--info-t)}
+
+.info-bar{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--suc-bg);border-bottom:0.5px solid var(--b);font-size:12px;color:var(--suc-t)}
+.warn-bar{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--warn-bg);border-bottom:0.5px solid var(--b);font-size:12px;color:var(--warn-t)}
+
+.spinner-inline{display:inline-block;width:12px;height:12px;border:1.5px solid var(--b2);border-top-color:var(--info-t);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">西班牙IVA发票税务管理系统 — 支持PDF上传、AI识别和税务计算</h2>
+
+<div class="app">
+
+<div class="tabs" id="tabs">
+  <button class="tab active" onclick="showTab('dash',this)">📊 总览</button>
+  <button class="tab" onclick="showTab('upload',this)">📄 上传发票</button>
+  <button class="tab" onclick="showTab('inv',this)">🧾 发票列表</button>
+  <button class="tab" onclick="showTab('tax',this)">🧮 IVA计算</button>
+  <button class="tab" onclick="showTab('q',this)">📅 季度</button>
+  <button class="tab" onclick="showTab('f303',this)">📋 303表格</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="page-dash" class="page active">
+  <div class="kpis" id="kpis"></div>
+  <div class="sc">
+    <div class="sh"><span class="stitle">最近发票</span><button onclick="showTab('inv',document.querySelectorAll('.tab')[2])">查看全部 →</button></div>
+    <div class="tw"><table>
+      <thead><tr><th>日期</th><th>客户/供应商</th><th>类型</th><th class="r">税前金额</th><th class="r">IVA</th><th class="c">来源</th></tr></thead>
+      <tbody id="recentTbody"></tbody>
+    </table></div>
+  </div>
+  <div class="sc">
+    <div class="sh"><span class="stitle">IVA 汇总</span></div>
+    <div class="iva-grid" id="ivaQuick"></div>
+  </div>
+</div>
+
+<!-- UPLOAD -->
+<div id="page-upload" class="page">
+  <div class="sc" style="margin-bottom:10px">
+    <div class="sh">
+      <span class="stitle">上传 PDF / 图片发票 — AI 自动识别</span>
+    </div>
+
+    <div class="info-bar">
+      <span style="font-size:16px;flex-shrink:0">💡</span>
+      <span>将邮件附件、手机拍照或扫描的发票直接拖入下方，系统调用 Claude AI 提取所有发票字段，核对后一键保存。支持西班牙语和中文发票。</span>
+    </div>
+
+    <div class="drop-zone" id="dropZone"
+      ondragover="dzOver(event)" ondragleave="dzLeave(event)" ondrop="dzDrop(event)"
+      onclick="document.getElementById('fileIn').click()">
+      <div class="drop-icon">📂</div>
+      <div class="drop-title">拖拽发票到这里，或点击选择文件</div>
+      <div class="drop-sub">支持 PDF、JPG、PNG · 可一次上传多份<br>文件在浏览器本地处理，不上传至任何服务器</div>
+      <div class="drop-btns">
+        <button onclick="event.stopPropagation();document.getElementById('fileIn').click()">选择文件</button>
+        <button onclick="event.stopPropagation();loadDemo()">查看演示效果</button>
+      </div>
+    </div>
+    <input type="file" id="fileIn" accept=".pdf,image/*" multiple style="display:none" onchange="handleUpload(this.files)">
+
+    <div class="queue" id="uploadQueue"></div>
+  </div>
+
+  <!-- Confirm modal in normal flow -->
+  <div class="modal-wrap" id="confirmWrap">
+    <div class="modal-inner">
+      <div class="modal-head">
+        <span class="modal-title">✅ 核对识别结果 — <span id="mFile" style="color:var(--info-t);font-weight:400;font-size:13px"></span></span>
+        <button onclick="closeConfirm()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex;align-items:center;gap:7px;padding:8px 10px;background:var(--suc-bg);border-radius:var(--border-radius-md);margin-bottom:10px;font-size:12px;color:var(--suc-t)">
+          <span>识别完成 — 请检查下方字段是否正确，修改后保存</span>
+          <span style="margin-left:auto;font-family:var(--font-mono)">置信度: <span id="confVal"></span>%</span>
+        </div>
+        <div style="font-size:11px;color:var(--t2);margin-bottom:4px;font-weight:500">原始识别文本</div>
+        <div class="raw-text" id="rawText"></div>
+        <div class="pf-grid">
+          <div class="pf"><label>客户/供应商名称</label><input id="p_name" type="text"></div>
+          <div class="pf"><label>发票号</label><input id="p_num" type="text"></div>
+          <div class="pf"><label>日期</label><input id="p_date" type="date"></div>
+          <div class="pf"><label>类型</label><select id="p_type"><option value="sale">销售（收入）</option><option value="purchase">采购（支出）</option></select></div>
+          <div class="pf"><label>税前金额 €</label><input id="p_base" type="number" min="0" step="0.01" oninput="updPrev()"></div>
+          <div class="pf"><label>IVA 税率</label><select id="p_rate" onchange="updPrev()"><option value="21">21% 一般</option><option value="10">10% 减半</option><option value="4">4% 超低</option><option value="0">0% 免税</option></select></div>
+          <div class="pf full"><label>备注</label><input id="p_note" type="text" placeholder="可选"></div>
+        </div>
+        <div class="prev-row" id="prevRow"></div>
+        <div style="display:flex;gap:8px">
+          <button onclick="confirmSave()" style="flex:1;padding:8px;background:var(--info-bg);color:var(--info-t);border:0.5px solid var(--info-t);border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;font-weight:500">保存到发票列表</button>
+          <button onclick="closeConfirm()">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI History -->
+  <div class="sc">
+    <div class="sh"><span class="stitle">AI 识别历史</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>文件名</th><th>时间</th><th>供应商</th><th class="c">类型</th><th class="c">税率</th><th class="r">税前</th><th class="r">IVA</th></tr></thead>
+      <tbody id="aiHistTbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- INVOICES -->
+<div id="page-inv" class="page">
+  <div class="sc" style="margin-bottom:10px">
+    <div class="sh"><span class="stitle">手动添加发票</span></div>
+    <div class="fgrid">
+      <div class="fl"><label>客户/供应商</label><input id="f_n" type="text" placeholder="Empresa S.L."></div>
+      <div class="fl"><label>日期</label><input id="f_d" type="date"></div>
+      <div class="fl"><label>类型</label><select id="f_t"><option value="sale">销售</option><option value="purchase">采购</option></select></div>
+      <div class="fl"><label>税前金额 €</label><input id="f_b" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      <div class="fl"><label>IVA 税率</label><select id="f_r"><option value="21">21%</option><option value="10">10%</option><option value="4">4%</option><option value="0">0%</option></select></div>
+      <div class="fl"><label>&nbsp;</label><button onclick="addInv()" style="padding:6px 12px;white-space:nowrap">+ 添加</button></div>
+    </div>
+  </div>
+  <div class="sc">
+    <div class="sh">
+      <span class="stitle">发票列表</span>
+      <div class="sh-right">
+        <input type="text" id="search" placeholder="搜索..." oninput="renderInv()" style="padding:4px 8px;font-size:12px;width:120px">
+        <select id="qFilter" onchange="renderInv()" style="font-size:12px;padding:4px 6px">
+          <option value="0">全年</option><option value="1">Q1</option><option value="2">Q2</option><option value="3">Q3</option><option value="4">Q4</option>
+        </select>
+        <button onclick="clearInv()" style="font-size:12px;color:var(--err-t)">清空</button>
+      </div>
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>日期</th><th>客户/供应商</th><th class="c">类型</th><th class="c">税率</th><th class="r">税前</th><th class="r">IVA</th><th class="r">含税</th><th class="c">来源</th><th></th></tr></thead>
+      <tbody id="invTbody"></tbody>
+    </table></div>
+    <div class="tf"><span>税前：</span><span class="v" id="totBase">€0.00</span><span>IVA：</span><span class="v r" id="totIVA">€0.00</span><span>含税：</span><span class="v b" id="totFull">€0.00</span></div>
+  </div>
+</div>
+
+<!-- TAX -->
+<div id="page-tax" class="page">
+  <div class="sc" style="margin-bottom:10px">
+    <div class="sh"><span class="stitle">快速 IVA 计算器</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;padding:12px 14px;align-items:end">
+      <div class="fl"><label>税前金额 €</label><input id="cb" type="number" min="0" step="0.01" oninput="qCalc()"></div>
+      <div class="fl"><label>IVA 税率</label><select id="cr" onchange="qCalc()"><option value="21">21%</option><option value="10">10%</option><option value="4">4%</option><option value="0">0%</option></select></div>
+      <div class="fl"><label>含税金额（反推）€</label><input id="ct" type="number" min="0" step="0.01" oninput="rCalc()"></div>
+      <div class="fl"><label>&nbsp;</label><button onclick="clrCalc()">清除</button></div>
+    </div>
+    <div class="prev-row" id="calcPrev" style="padding:0 14px 14px"></div>
+  </div>
+  <div class="sc">
+    <div class="sh"><span class="stitle">IVA 清算明细</span></div>
+    <div class="tax-row hd"><div class="tc">税率</div><div class="tc r">销售税基</div><div class="tc r">销项 IVA</div><div class="tc r">采购税基</div><div class="tc r">进项 IVA</div></div>
+    <div id="taxRows"></div>
+    <div class="iva-grid" id="liqBox"></div>
+  </div>
+</div>
+
+<!-- QUARTERS -->
+<div id="page-q" class="page">
+  <div class="sc">
+    <div class="sh"><span class="stitle">四季度年度概览</span></div>
+    <div class="q-grid" id="qGrid"></div>
+  </div>
+  <div class="sc" id="qDetail" style="display:none">
+    <div class="sh"><span class="stitle" id="qDTitle">季度明细</span><button onclick="document.getElementById('qDetail').style.display='none'">关闭</button></div>
+    <div class="tw"><table>
+      <thead><tr><th>日期</th><th>客户/供应商</th><th class="c">类型</th><th class="c">税率</th><th class="r">税前</th><th class="r">IVA</th><th class="r">含税</th></tr></thead>
+      <tbody id="qDTbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- 303 -->
+<div id="page-f303" class="page">
+  <div class="sc">
+    <div class="sh"><span class="stitle">Modelo 303 — 预览</span><button onclick="window.print()">打印</button></div>
+    <div class="f303" id="f303body"></div>
+  </div>
+</div>
+
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+let invs = JSON.parse(localStorage.getItem('iva_invs')||'[]');
+let aiHist = JSON.parse(localStorage.getItem('iva_aihist')||'[]');
+let ctr = parseInt(localStorage.getItem('iva_ctr')||'0');
+let curFile = null;
+let curYear = new Date().getFullYear();
+
+const save = () => localStorage.setItem('iva_invs', JSON.stringify(invs));
+const saveH = () => localStorage.setItem('iva_aihist', JSON.stringify(aiHist.slice(-60)));
+const getQ = d => { const m=new Date(d).getMonth()+1; return m<=3?1:m<=6?2:m<=9?3:4; };
+const curQ = () => parseInt(document.getElementById('qFilter')?.value||'0');
+const fmt = n => '€'+parseFloat(n||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fR = n => parseFloat(n||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function filtInvs() {
+  const q = curQ();
+  return invs.filter(i => {
+    if(!i.date) return false;
+    if(new Date(i.date).getFullYear() !== curYear) return false;
+    if(q===0) return true;
+    return getQ(i.date)===q;
+  });
+}
+
+function calcS(list) {
+  let sb=0,sv=0,pb=0,pv=0;
+  list.forEach(i=>{const b=parseFloat(i.base)||0,v=b*parseFloat(i.rate)/100; if(i.type==='sale'){sb+=b;sv+=v}else{pb+=b;pv+=v}});
+  return {sb,sv,pb,pv,net:sv-pv};
+}
+
+function renderAll() {
+  renderKPIs(); renderRecent(); renderIVAQuick();
+  renderInv(); renderTax(); renderQs(); render303(); renderAIHist();
+}
+
+function renderKPIs() {
+  const s = calcS(filtInvs()), inv=filtInvs();
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="kpi-l">销售总额（税前）</div><div class="kpi-v">${fmt(s.sb)}</div><div class="kpi-s">${inv.filter(i=>i.type==='sale').length} 张销售发票</div></div>
+    <div class="kpi"><div class="kpi-l">销项 IVA（应缴）</div><div class="kpi-v" style="color:var(--err-t)">${fmt(s.sv)}</div><div class="kpi-s">向客户收取，需上缴</div></div>
+    <div class="kpi"><div class="kpi-l">进项 IVA（可抵扣）</div><div class="kpi-v" style="color:var(--suc-t)">${fmt(s.pv)}</div><div class="kpi-s">${inv.filter(i=>i.type==='purchase').length} 张采购发票</div></div>
+    <div class="kpi"><div class="kpi-l">净应缴 IVA</div><div class="kpi-v" style="color:${s.net>=0?'var(--err-t)':'var(--suc-t)'}">${fmt(Math.abs(s.net))}</div><div class="kpi-s">${s.net>0?'需向税务局缴纳':s.net<0?'可申请退税':'持平'}</div></div>`;
+}
+
+function renderRecent() {
+  const inv = filtInvs().slice().reverse().slice(0,5);
+  const tb = document.getElementById('recentTbody');
+  if(!inv.length){tb.innerHTML=`<tr><td colspan="6" class="empty-td">暂无发票数据</td></tr>`;return;}
+  tb.innerHTML = inv.map(i=>{const b=parseFloat(i.base),v=b*parseFloat(i.rate)/100;return`<tr>
+    <td>${i.date}</td><td>${i.name}</td>
+    <td class="c"><span class="badge ${i.type==='sale'?'b-sale':'b-buy'}">${i.type==='sale'?'销售':'采购'}</span></td>
+    <td class="r mono">${fmt(b)}</td>
+    <td class="r mono" style="color:${i.type==='sale'?'var(--err-t)':'var(--suc-t)'}">${fmt(v)}</td>
+    <td class="c"><span class="badge ${i.source==='ai'?'b-ai':'b-manual'}">${i.source==='ai'?'AI':'手动'}</span></td>
+  </tr>`;}).join('');
+}
+
+function renderIVAQuick() {
+  const s = calcS(filtInvs()); const net=s.net;
+  const st = net>0?`<span class="iva-status is-pay">需缴纳 → 税务局</span>`:net<0?`<span class="iva-status is-ref">可申请退税</span>`:`<span class="iva-status is-zero">持平</span>`;
+  document.getElementById('ivaQuick').innerHTML=`
+    <div class="iva-box rep"><div class="iva-label">销项 IVA</div><div class="iva-amt">${fmt(s.sv)}</div><div class="iva-note">向客户收取，需上缴</div></div>
+    <div class="iva-box dep"><div class="iva-label">进项 IVA（可抵）</div><div class="iva-amt">${fmt(s.pv)}</div><div class="iva-note">采购支付，可抵扣</div></div>
+    <div class="iva-box liq"><div class="iva-label">清算结果 = 销项 − 进项</div><div class="iva-amt">${fmt(Math.abs(net))}</div>${st}<div class="iva-note" style="margin-top:4px">${fmt(s.sv)} − ${fmt(s.pv)} = ${fmt(net)}</div></div>`;
+}
+
+function renderInv() {
+  let list = filtInvs();
+  const q = (document.getElementById('search')?.value||'').toLowerCase();
+  if(q) list=list.filter(i=>(i.name+(i.num||'')+(i.note||'')).toLowerCase().includes(q));
+  const tb=document.getElementById('invTbody');
+  if(!list.length){tb.innerHTML=`<tr><td colspan="9" class="empty-td">暂无发票</td></tr>`;
+    ['totBase','totIVA','totFull'].forEach(id=>document.getElementById(id).textContent='€0.00');return;}
+  let tB=0,tV=0;
+  tb.innerHTML=list.slice().reverse().map(i=>{
+    const b=parseFloat(i.base),v=b*parseFloat(i.rate)/100,t=b+v,ri=invs.indexOf(i);tB+=b;tV+=v;
+    return`<tr>
+      <td>${i.date}</td><td>${i.name}</td>
+      <td class="c"><span class="badge ${i.type==='sale'?'b-sale':'b-buy'}">${i.type==='sale'?'销售':'采购'}</span></td>
+      <td class="c"><span class="badge b-${i.rate}">${i.rate}%</span></td>
+      <td class="r mono">${fmt(b)}</td>
+      <td class="r mono" style="color:${i.type==='sale'?'var(--err-t)':'var(--suc-t)'}">${fmt(v)}</td>
+      <td class="r mono">${fmt(t)}</td>
+      <td class="c"><span class="badge ${i.source==='ai'?'b-ai':'b-manual'}">${i.source==='ai'?'AI':'手动'}</span></td>
+      <td><button onclick="delInv(${ri})" style="font-size:11px;color:var(--err-t);padding:2px 6px">删除</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('totBase').textContent=fmt(tB);
+  document.getElementById('totIVA').textContent=fmt(tV);
+  document.getElementById('totFull').textContent=fmt(tB+tV);
+}
+
+function renderTax() {
+  const inv=filtInvs(); let html='',tS=0,tP=0;
+  [21,10,4,0].forEach(r=>{
+    const sB=inv.filter(i=>i.type==='sale'&&parseFloat(i.rate)===r).reduce((a,i)=>a+parseFloat(i.base),0);
+    const pB=inv.filter(i=>i.type==='purchase'&&parseFloat(i.rate)===r).reduce((a,i)=>a+parseFloat(i.base),0);
+    const sV=sB*r/100,pV=pB*r/100;tS+=sV;tP+=pV;
+    if(sB===0&&pB===0)return;
+    html+=`<div class="tax-row">
+      <div class="tc"><span class="badge b-${r}">${r}%</span></div>
+      <div class="tc r">${fmt(sB)}</div><div class="tc r" style="color:var(--err-t)">${fmt(sV)}</div>
+      <div class="tc r">${fmt(pB)}</div><div class="tc r" style="color:var(--suc-t)">${fmt(pV)}</div>
+    </div>`;
+  });
+  if(!html)html=`<div style="padding:16px;text-align:center;color:var(--t3);font-size:13px">暂无数据</div>`;
+  document.getElementById('taxRows').innerHTML=html;
+  const net=tS-tP;
+  const st=net>0?`<span class="iva-status is-pay">需缴 ${fmt(net)}</span>`:net<0?`<span class="iva-status is-ref">可退 ${fmt(Math.abs(net))}</span>`:`<span class="iva-status is-zero">持平</span>`;
+  document.getElementById('liqBox').innerHTML=`
+    <div class="iva-box rep"><div class="iva-label">销项 IVA 合计</div><div class="iva-amt">${fmt(tS)}</div><div class="iva-note">需上缴税务局</div></div>
+    <div class="iva-box dep"><div class="iva-label">进项 IVA 合计</div><div class="iva-amt">${fmt(tP)}</div><div class="iva-note">可抵扣</div></div>
+    <div class="iva-box liq"><div class="iva-label">净应缴/退 IVA（${fmt(tS)} − ${fmt(tP)}）</div><div class="iva-amt">${fmt(Math.abs(net))}</div>${st}</div>`;
+}
+
+function renderQs() {
+  const QP={1:'1月–3月',2:'4月–6月',3:'7月–9月',4:'10月–12月'};
+  const QD={1:'4月20日',2:'7月20日',3:'10月20日',4:'1月30日(次年)'};
+  let html='';
+  [1,2,3,4].forEach(q=>{
+    const list=invs.filter(i=>i.date&&new Date(i.date).getFullYear()===curYear&&getQ(i.date)===q);
+    const s=calcS(list),net=s.sv-s.pv;
+    html+=`<div class="q-box" onclick="showQD(${q})">
+      <div class="q-head"><span class="q-title">Q${q} 第${['一','二','三','四'][q-1]}季度</span><span class="q-period">${QP[q]}</span></div>
+      <div class="q-body">
+        <div class="q-stat"><span class="q-sl">销售税前</span><span class="q-sv b">${fmt(s.sb)}</span></div>
+        <div class="q-stat"><span class="q-sl">销项 IVA</span><span class="q-sv r">${fmt(s.sv)}</span></div>
+        <div class="q-stat"><span class="q-sl">进项 IVA</span><span class="q-sv g">${fmt(s.pv)}</span></div>
+        <div class="q-div"></div>
+        <div class="q-stat"><span class="q-sl" style="font-weight:500">净应缴 IVA</span><span class="q-sv ${net>=0?'r':'g'}" style="font-weight:500">${fmt(Math.abs(net))}</span></div>
+      </div>
+      <div class="q-foot">申报截止：${QD[q]}</div>
+    </div>`;
+  });
+  document.getElementById('qGrid').innerHTML=html;
+}
+
+function showQD(q) {
+  const list=invs.filter(i=>i.date&&new Date(i.date).getFullYear()===curYear&&getQ(i.date)===q);
+  document.getElementById('qDTitle').textContent=`Q${q} 第${['一','二','三','四'][q-1]}季度明细`;
+  const tb=document.getElementById('qDTbody');
+  if(!list.length){tb.innerHTML=`<tr><td colspan="7" class="empty-td">无数据</td></tr>`;}
+  else tb.innerHTML=list.map(i=>{const b=parseFloat(i.base),v=b*parseFloat(i.rate)/100;return`<tr>
+    <td>${i.date}</td><td>${i.name}</td>
+    <td class="c"><span class="badge ${i.type==='sale'?'b-sale':'b-buy'}">${i.type==='sale'?'销售':'采购'}</span></td>
+    <td class="c"><span class="badge b-${i.rate}">${i.rate}%</span></td>
+    <td class="r mono">${fmt(b)}</td><td class="r mono" style="color:${i.type==='sale'?'var(--err-t)':'var(--suc-t)'}">${fmt(v)}</td>
+    <td class="r mono">${fmt(b+v)}</td>
+  </tr>`;}).join('');
+  document.getElementById('qDetail').style.display='block';
+}
+
+function render303() {
+  const inv=filtInvs();
+  const rowsFn=(type,bm)=>[21,10,4].map(rate=>{
+    const b=inv.filter(i=>i.type===type&&parseFloat(i.rate)===rate).reduce((a,i)=>a+parseFloat(i.base),0),v=b*rate/100;
+    return`<div class="f303-row"><div class="fc num">[${(bm[rate]||[0])[0]}]</div><div class="fc label">IVA ${rate}% ${type==='sale'?'销售':'采购'}税基</div><div class="fc val">${fR(b)}</div><div class="fc val">${fR(v)}</div></div>`;
+  }).join('');
+  const sV=[21,10,4].reduce((a,r)=>a+inv.filter(i=>i.type==='sale'&&parseFloat(i.rate)===r).reduce((x,i)=>x+parseFloat(i.base),0)*r/100,0);
+  const pV=[21,10,4].reduce((a,r)=>a+inv.filter(i=>i.type==='purchase'&&parseFloat(i.rate)===r).reduce((x,i)=>x+parseFloat(i.base),0)*r/100,0);
+  const net=sV-pV;
+  document.getElementById('f303body').innerHTML=`
+    <div class="f303-title"><h2>Modelo 303 — Declaración IVA</h2><p>${curYear}年 · Agencia Tributaria España</p></div>
+    <div class="f303-sec"><div class="f303-sh">DEVENGADO — 销项 IVA</div>
+    <div class="f303-row" style="background:var(--s)"><div class="fc num" style="font-weight:500">栏</div><div class="fc label" style="font-weight:500">项目</div><div class="fc val" style="font-weight:500">税基 €</div><div class="fc val" style="font-weight:500">IVA €</div></div>
+    ${rowsFn('sale',{21:[1],10:[4],4:[7]})}
+    <div class="f303-total"><div class="f303-tl">[27] 销项 IVA 合计</div><div class="f303-tv">${fmt(sV)}</div></div></div>
+    <div class="f303-sec"><div class="f303-sh">DEDUCIBLE — 进项 IVA</div>
+    ${rowsFn('purchase',{21:[22],10:[25],4:[28]})}
+    <div class="f303-total" style="background:var(--suc-bg)"><div class="f303-tl" style="color:var(--suc-t)">[45] 进项 IVA 合计</div><div class="f303-tv" style="color:var(--suc-t)">${fmt(pV)}</div></div></div>
+    <div class="f303-sec"><div class="f303-sh">RESULTADO — 清算结果</div>
+    <div class="f303-row"><div class="fc num">[46]</div><div class="fc label">销项 IVA 合计</div><div class="fc val">${fR(sV)}</div><div class="fc val"></div></div>
+    <div class="f303-row"><div class="fc num">[65]</div><div class="fc label">进项 IVA 合计</div><div class="fc val">${fR(pV)}</div><div class="fc val"></div></div>
+    <div class="f303-total" style="${net>=0?'background:var(--err-bg)':'background:var(--suc-bg)'}">
+      <div class="f303-tl" style="color:${net>=0?'var(--err-t)':'var(--suc-t)'}">[70] ${net>=0?'应缴':'可退'} IVA</div>
+      <div class="f303-tv" style="color:${net>=0?'var(--err-t)':'var(--suc-t)'}">${fmt(Math.abs(net))}</div>
+    </div></div>
+    <div style="margin-top:10px;padding:8px 10px;background:var(--warn-bg);border-radius:var(--border-radius-md);font-size:11px;color:var(--warn-t)">⚠ 本预览仅供参考，请登录 www.agenciatributaria.es 提交正式申报。</div>`;
+}
+
+function renderAIHist() {
+  const tb=document.getElementById('aiHistTbody');
+  if(!aiHist.length){tb.innerHTML=`<tr><td colspan="7" class="empty-td">暂无AI识别记录 — 上传发票后将在此显示</td></tr>`;return;}
+  tb.innerHTML=aiHist.slice().reverse().slice(0,15).map(h=>{const b=parseFloat(h.base||0),v=b*parseFloat(h.rate||0)/100;return`<tr>
+    <td style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;color:var(--t2)">${h.filename||'—'}</td>
+    <td style="font-size:11px">${h.time}</td><td>${h.name}</td>
+    <td class="c"><span class="badge ${h.type==='sale'?'b-sale':'b-buy'}">${h.type==='sale'?'销售':'采购'}</span></td>
+    <td class="c"><span class="badge b-${h.rate}">${h.rate}%</span></td>
+    <td class="r mono">${fmt(b)}</td><td class="r mono" style="color:${h.type==='sale'?'var(--err-t)':'var(--suc-t)'}">${fmt(v)}</td>
+  </tr>`;}).join('');
+}
+
+function updPrev() {
+  const b=parseFloat(document.getElementById('p_base').value)||0;
+  const r=parseFloat(document.getElementById('p_rate').value)||0;
+  const v=b*r/100;
+  document.getElementById('prevRow').innerHTML=`
+    <div class="prev-box"><div class="prev-box-l">税前金额</div><div class="prev-box-v">${fmt(b)}</div></div>
+    <div class="prev-box red"><div class="prev-box-l">IVA (${r}%)</div><div class="prev-box-v">${fmt(v)}</div></div>
+    <div class="prev-box blue"><div class="prev-box-l">含税合计</div><div class="prev-box-v">${fmt(b+v)}</div></div>`;
+}
+
+function qCalc() {
+  document.getElementById('ct').value='';
+  const b=parseFloat(document.getElementById('cb').value),r=parseFloat(document.getElementById('cr').value);
+  if(isNaN(b)){showCalcPrev(null);return;}
+  showCalcPrev(b,r);
+}
+function rCalc() {
+  document.getElementById('cb').value='';
+  const t=parseFloat(document.getElementById('ct').value),r=parseFloat(document.getElementById('cr').value);
+  if(isNaN(t)){showCalcPrev(null);return;}
+  const b=t/(1+r/100);showCalcPrev(b,r);
+}
+function clrCalc(){document.getElementById('cb').value='';document.getElementById('ct').value='';showCalcPrev(null);}
+function showCalcPrev(b,r){
+  const el=document.getElementById('calcPrev');
+  if(b===null){el.innerHTML='';return;}
+  const v=b*r/100;
+  el.innerHTML=`
+    <div class="prev-box"><div class="prev-box-l">税前金额</div><div class="prev-box-v">${fmt(b)}</div></div>
+    <div class="prev-box red"><div class="prev-box-l">IVA (${r}%)</div><div class="prev-box-v">${fmt(v)}</div></div>
+    <div class="prev-box blue"><div class="prev-box-l">含税合计</div><div class="prev-box-v">${fmt(b+v)}</div></div>`;
+}
+
+function addInv() {
+  const name=document.getElementById('f_n').value.trim(), base=parseFloat(document.getElementById('f_b').value), date=document.getElementById('f_d').value;
+  if(!name||isNaN(base)||base<0||!date){toast('请填写完整信息');return;}
+  ctr++; localStorage.setItem('iva_ctr',ctr);
+  invs.push({id:Date.now(),source:'manual',name,date,type:document.getElementById('f_t').value,base,rate:document.getElementById('f_r').value,note:''});
+  save(); renderAll();
+  document.getElementById('f_n').value=''; document.getElementById('f_b').value='';
+  document.getElementById('f_d').value=new Date().toISOString().split('T')[0];
+  toast('已添加发票');
+}
+
+function delInv(i){if(!confirm('删除？'))return;invs.splice(i,1);save();renderAll();toast('已删除');}
+function clearInv(){if(!confirm('清空当前筛选范围内所有发票？'))return;const q=curQ();invs=invs.filter(i=>{if(!i.date)return false;if(new Date(i.date).getFullYear()!==curYear)return true;return q!==0&&getQ(i.date)!==q;});save();renderAll();toast('已清空');}
+
+/* ═══ UPLOAD + AI PARSE ═══ */
+function dzOver(e){e.preventDefault();document.getElementById('dropZone').classList.add('over');}
+function dzLeave(e){document.getElementById('dropZone').classList.remove('over');}
+function dzDrop(e){e.preventDefault();document.getElementById('dropZone').classList.remove('over');handleUpload(e.dataTransfer.files);}
+
+function handleUpload(files) {
+  Array.from(files).forEach(f => {
+    if(f.type==='application/pdf'||f.type.startsWith('image/')) processFile(f);
+    else toast('不支持 '+f.name+' 的格式，请上传PDF或图片');
+  });
+}
+
+async function processFile(file) {
+  const qid='qi_'+Date.now();
+  const q=document.getElementById('uploadQueue');
+  const el=document.createElement('div'); el.className='qi'; el.id=qid;
+  el.innerHTML=`<span style="font-size:18px">📄</span>
+    <div class="qi-info"><div class="qi-name">${file.name}</div><div class="qi-status run" id="${qid}_s"><span class="spinner-inline"></span>读取文件中...</div></div>
+    <div class="qi-prog"><div class="qi-bar" id="${qid}_b" style="width:10%"></div></div>`;
+  q.appendChild(el);
+  const set=(msg,pct,st='run')=>{
+    const s=document.getElementById(qid+'_s'),b=document.getElementById(qid+'_b');
+    if(s){s.className='qi-status '+st;s.innerHTML=(st==='run'?'<span class="spinner-inline"></span>':'')+msg;}
+    if(b) b.style.width=pct+'%';
+  };
+  try {
+    set('转换文件为文本...', 30);
+    const text = await extractTextFromFile(file);
+    set('调用 Claude AI 识别...', 60);
+    const result = await callClaudeAPI(file, text);
+    set('识别完成，请核对', 100, 'ok');
+    openConfirm(file.name, result);
+  } catch(e) {
+    set('❌ '+e.message, 100, 'err');
+  }
+}
+
+/* Extract text from PDF via PDF.js or read as image */
+async function extractTextFromFile(file) {
+  if(file.type==='application/pdf') {
+    try {
+      if(typeof pdfjsLib !== 'undefined') {
+        const buf = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({data:buf}).promise;
+        let text='';
+        for(let i=1;i<=Math.min(pdf.numPages,3);i++){
+          const page=await pdf.getPage(i);
+          const tc=await page.getTextContent();
+          text+=tc.items.map(t=>t.str).join(' ')+'\n';
         }
-    </style>
-</head>
-<body>
-    <h1>✅ GitHub Pages 配置成功！</h1>
-    <p>Tu sitio web está funcionando correctamente.</p>
-    <p>Visita: https://yihuwangji.github.io/facturas-iva/</p>
-</body>
-</html>
+        return text.trim();
+      }
+    } catch(e){}
+  }
+  return '';
+}
+
+/* Call Claude API — uses the artifact's built-in API access */
+async function callClaudeAPI(file, extractedText) {
+  const b64 = await fileToB64(file);
+  const mediaType = file.type || 'application/pdf';
+  const isImg = file.type.startsWith('image/');
+
+  const contentParts = [];
+
+  if(isImg) {
+    contentParts.push({type:'image',source:{type:'base64',media_type:mediaType,data:b64}});
+  } else {
+    contentParts.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}});
+  }
+
+  if(extractedText) {
+    contentParts.push({type:'text',text:'已提取的文本内容：\n'+extractedText+'\n\n'});
+  }
+
+  contentParts.push({type:'text',text:`分析这张发票，只返回JSON（无其他文字）：
+{"name":"供应商或客户名称","num":"发票号","date":"YYYY-MM-DD","type":"sale或purchase","base":税前数字,"rate":21或10或4或0,"confidence":0到100,"raw_text":"发票关键信息摘要","notes":"备注"}
+规则：base_imponible=税前金额，tipo IVA=税率，你开出的发票=sale，别人开给你的=purchase。只返回JSON。`});
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:800,
+      messages:[{role:'user',content:contentParts}]
+    })
+  });
+
+  if(!resp.ok) {
+    const e=await resp.json().catch(()=>({}));
+    throw new Error(e.error?.message||'API 请求失败 ('+resp.status+')');
+  }
+  const data=await resp.json();
+  const raw=data.content?.find(c=>c.type==='text')?.text||'';
+  try {
+    const m=raw.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+    return JSON.parse(m?m[0]:raw);
+  } catch(e){ throw new Error('AI返回格式错误，请重试'); }
+}
+
+function fileToB64(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>res(e.target.result.split(',')[1]);
+    r.onerror=()=>rej(new Error('文件读取失败'));
+    r.readAsDataURL(file);
+  });
+}
+
+function openConfirm(filename, parsed) {
+  curFile={filename,parsed};
+  document.getElementById('mFile').textContent=filename;
+  document.getElementById('p_name').value=parsed.name||'';
+  document.getElementById('p_num').value=parsed.num||'';
+  document.getElementById('p_date').value=parsed.date||new Date().toISOString().split('T')[0];
+  document.getElementById('p_type').value=parsed.type==='sale'?'sale':'purchase';
+  document.getElementById('p_base').value=parsed.base||'';
+  document.getElementById('p_rate').value=[21,10,4,0].includes(parseInt(parsed.rate))?parseInt(parsed.rate):21;
+  document.getElementById('p_note').value=parsed.notes||'';
+  document.getElementById('rawText').textContent=parsed.raw_text||'（无文本）';
+  document.getElementById('confVal').textContent=Math.min(100,Math.max(0,parseInt(parsed.confidence)||80));
+  updPrev();
+  document.getElementById('confirmWrap').classList.add('open');
+}
+
+function closeConfirm(){document.getElementById('confirmWrap').classList.remove('open');curFile=null;}
+
+function confirmSave() {
+  const name=document.getElementById('p_name').value.trim(), base=parseFloat(document.getElementById('p_base').value), date=document.getElementById('p_date').value;
+  if(!name||isNaN(base)||base<0||!date){toast('请填写完整信息');return;}
+  ctr++; localStorage.setItem('iva_ctr',ctr);
+  const inv={id:Date.now(),source:'ai',name,date,type:document.getElementById('p_type').value,base,rate:document.getElementById('p_rate').value,note:document.getElementById('p_note').value.trim(),filename:curFile?.filename||''};
+  invs.push(inv); save();
+  aiHist.push({...inv,time:new Date().toLocaleString('zh-CN')}); saveH();
+  closeConfirm(); renderAll();
+  toast('已保存：'+name+' · IVA '+fmt(base*parseFloat(inv.rate)/100));
+}
+
+function loadDemo() {
+  openConfirm('Factura_demo_2025.pdf',{
+    name:'Suministros Tech S.L.',num:'2025-0342',date:new Date().toISOString().split('T')[0],
+    type:'purchase',base:1250,rate:21,confidence:94,
+    raw_text:'FACTURA Nº 2025-0342\nSuministros Tech S.L.\nBase Imponible: 1.250,00 €\nCuota IVA 21%: 262,50 €\nTOTAL: 1.512,50 €',
+    notes:'演示数据'
+  });
+}
+
+/* ═══ NAV ═══ */
+function showTab(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+
+function toast(msg){const n=document.getElementById('notif');n.textContent=msg;n.classList.add('show');clearTimeout(n._t);n._t=setTimeout(()=>n.classList.remove('show'),3000);}
+
+/* init */
+document.getElementById('f_d').value=new Date().toISOString().split('T')[0];
+renderAll();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+if(typeof pdfjsLib !== 'undefined') pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+</script>
